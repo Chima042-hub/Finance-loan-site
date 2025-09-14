@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SmartFinance Loans</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fa;
+      color: #333;
+    }
+    header {
+      background-color: #004080;
+      color: white;
+      padding: 1.5em;
+      text-align: center;
+    }
+    nav {
+      background-color: #e0e0e0;
+      padding: 1em;
+      text-align: center;
+    }
+    nav a {
+      margin: 0 1em;
+      text-decoration: none;
+      color: #004080;
+      font-weight: bold;
+    }
+    section {
+      padding: 2em;
+      max-width: 900px;
+      margin: auto;
+    }
+    h2 {
+      color: #004080;
+    }
+    .loan-types {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1em;
+    }
+    .loan-card {
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 1em;
+      flex: 1 1 250px;
+      border-radius: 8px;
+    }
+    footer {
+      background-color: #eee;
+      text-align: center;
+      padding: 1em;
+      margin-top: 2em;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>SmartFinance Loans</h1>
+    <p>Your trusted partner for personal and business financing</p>
+  </header>
+
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">Loan Types</a>
+    <a href="#">Apply</a>
+    <a href="#">Contact</a>
+  </nav>
+
+  <section>
+    <h2>Welcome to SmartFinance</h2>
+    <p>We offer flexible loan solutions tailored to your needs. Whether you're starting a business, buying a home, or managing personal expenses, SmartFinance is here to support your financial journey.</p>
+  </section>
+
+  <section>
+    <h2>Loan Options</h2>
+    <div class="loan-types">
+      <div class="loan-card">
+        <h3>Personal Loan</h3>
+        <p>Quick approval and low interest rates for personal expenses, emergencies, or lifestyle upgrades.</p>
+      </div>
+      <div class="loan-card">
+        <h3>Business Loan</h3>
+        <p>Fuel your startup or expand your operations with our tailored business financing plans.</p>
+      </div>
+      <div class="loan-card">
+        <h3>Home Loan</h3>
+        <p>Affordable mortgage solutions to help you buy or renovate your dream home.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Apply Now</h2>
+    <form>
+      <label for="name">Full Name:</label><br>
+      <input type="text" id="name" name="name" required><br><br>
+
+      <label for="email">Email Address:</label><br>
+      <input type="email" id="email" name="email" required><br><br>
+
+      <label for="loan-type">Select Loan Type:</label><br>
+      <select id="loan-type" name="loan-type">
+        <option value="personal">Personal Loan</option>
+        <option value="business">Business Loan</option>
+        <option value="home">Home Loan</option>
+      </select><br><br>
+
+      <label for="amount">Loan Amount:</label><br>
+      <input type="number" id="amount" name="amount" required><br><br>
+
+      <button type="submit">Submit Application</button>
+    </form>
+  </section>
+
+  <footer>
+    <p>© 2025 SmartFinance Loans | Designed by Joseph Chimakpa Njoku</p>
+  </footer>
+
+</body>
+</html>
+
