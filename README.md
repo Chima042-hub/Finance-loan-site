@@ -98,6 +98,7 @@ Draft handling uses browser local storage:
 - Save draft manually
 - Resume draft manually
 - Auto-save while user types
+- Drafts older than 7 days automatically expire and are removed
 - Clears draft after successful submission
 
 ### 8) Application Tracker
