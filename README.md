@@ -160,6 +160,10 @@ Option 2 (recommended for cleaner testing):
 
 Please review the security policy in [SECURITY.md](SECURITY.md) for supported versions and vulnerability reporting guidance.
 
+## Privacy
+
+Please review [PRIVACY.md](PRIVACY.md) for the demo privacy notice and local data storage behavior.
+
 ## Current Notes
 
 - This version is frontend-only (no backend API/database)
