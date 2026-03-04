@@ -97,7 +97,6 @@ Draft handling uses browser local storage:
 
 - Save draft manually
 - Resume draft manually
-- Auto-save while user types
 - Drafts older than 7 days automatically expire and are removed
 - Clears draft after successful submission
 
@@ -134,8 +133,12 @@ Tracker stage is time-based (simulated):
 
 ## Project Structure
 
-- `index.html` — complete frontend app (styles + markup + logic)
+- `index.html` — app structure and content
+- `styles.css` — visual styles and layout
+- `app.js` — interactive logic and local storage handling
 - `README.md` — project documentation
+- `PRIVACY.md` — demo privacy notice
+- `SECURITY.md` — security policy and reporting process
 
 ## Run Locally
 

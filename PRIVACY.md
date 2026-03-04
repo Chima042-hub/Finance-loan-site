@@ -8,6 +8,8 @@ The application form may collect name, email, phone, and loan preferences.
 
 ## Where data is stored
 - Drafts and application tracker records are stored locally in your browser using `localStorage`.
+- Saved application drafts automatically expire after 7 days and are removed.
+- Tracker records are device-local and use minimal data (for example, masked phone reference in status summaries).
 - Data does not automatically leave your device because there is no backend server.
 
 ## Recommendations
