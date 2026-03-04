@@ -33,6 +33,7 @@ const calcTenure = document.getElementById("calc-tenure");
 const monthlyEmiEl = document.getElementById("monthly-emi");
 const totalPayEl = document.getElementById("total-pay");
 const totalInterestEl = document.getElementById("total-interest");
+
 const payoffForm = document.getElementById("payoff-form");
 const payoffPrincipal = document.getElementById("payoff-principal");
 const payoffRate = document.getElementById("payoff-rate");
@@ -221,6 +222,7 @@ eligibilityForm.addEventListener("submit", (event) => {
     tipItem.textContent = tip;
     eligibilityCoachEl.appendChild(tipItem);
   });
+
   eligibleAmount.textContent = formatRand(maxLoan);
 });
 
@@ -241,10 +243,13 @@ const trackerLastUpdatedEl = document.getElementById("tracker-last-updated");
 const trackerSummaryEl = document.getElementById("tracker-summary");
 const clearTrackerBtn = document.getElementById("clear-tracker-btn");
 const trackerStepEls = Array.from(document.querySelectorAll("#tracker-steps .tracker-step"));
+
 const saPhonePattern = /^0\d{2} \d{3} \d{4}$/;
 const applicationDraftKey = "chima-loan-service-application-draft-v1";
 const trackerStorageKey = "chima-loan-service-tracker-v1";
 const applicationFieldIds = ["loan-type", "amount", "tenure", "consent"];
+const draftTtlDays = 7;
+const draftTtlMs = draftTtlDays * 24 * 60 * 60 * 1000;
 
 function setDraftStatus(message, isReady = false) {
   draftStatusEl.textContent = message;
@@ -287,6 +292,29 @@ function applyApplicationDraft(data) {
   phoneInput.value = formatSouthAfricanPhone(phoneInput.value);
 }
 
+function getStoredValidDraft() {
+  try {
+    const raw = localStorage.getItem(applicationDraftKey);
+
+    if (!raw) {
+      return { draft: null, reason: "missing" };
+    }
+
+    const parsed = JSON.parse(raw);
+    const updatedAtMs = new Date(parsed.updatedAt || 0).getTime();
+
+    if (!Number.isFinite(updatedAtMs) || Date.now() - updatedAtMs > draftTtlMs) {
+      localStorage.removeItem(applicationDraftKey);
+      return { draft: null, reason: "expired" };
+    }
+
+    return { draft: parsed, reason: "ok" };
+  } catch (error) {
+    localStorage.removeItem(applicationDraftKey);
+    return { draft: null, reason: "invalid" };
+  }
+}
+
 function saveApplicationDraft(showMessage = true) {
   try {
     const payload = collectApplicationDraft();
@@ -302,29 +330,27 @@ function saveApplicationDraft(showMessage = true) {
 }
 
 function resumeApplicationDraft(showMessage = true) {
-  try {
-    const raw = localStorage.getItem(applicationDraftKey);
+  const storedDraft = getStoredValidDraft();
 
-    if (!raw) {
-      if (showMessage) {
+  if (!storedDraft.draft) {
+    if (showMessage) {
+      if (storedDraft.reason === "expired") {
+        setDraftStatus(`Saved draft expired after ${draftTtlDays} days and was removed.`);
+      } else {
         setDraftStatus("No saved draft found on this device.");
       }
-      return false;
     }
-
-    const parsed = JSON.parse(raw);
-    applyApplicationDraft(parsed);
-
-    if (showMessage) {
-      const stamp = parsed.updatedAt ? new Date(parsed.updatedAt).toLocaleString() : "previous session";
-      setDraftStatus(`Draft resumed from ${stamp}.`, true);
-    }
-
-    return true;
-  } catch (error) {
-    setDraftStatus("Saved draft could not be loaded. Save a new draft and try again.");
     return false;
   }
+
+  applyApplicationDraft(storedDraft.draft);
+
+  if (showMessage) {
+    const stamp = storedDraft.draft.updatedAt ? new Date(storedDraft.draft.updatedAt).toLocaleString() : "previous session";
+    setDraftStatus(`Draft resumed from ${stamp}.`, true);
+  }
+
+  return true;
 }
 
 function clearApplicationDraft() {
@@ -538,7 +564,7 @@ clearTrackerBtn.addEventListener("click", () => {
   localStorage.removeItem(trackerStorageKey);
   trackerReferenceInput.value = "";
   latestReferenceEl.textContent = "Not generated yet";
-  latestReferenceBox.style.display = "none";
+  latestReferenceBox.classList.add("hidden");
   renderTrackerRecord(null, "Tracker data cleared on this device.");
 });
 
@@ -547,7 +573,7 @@ clearAllDataBtn.addEventListener("click", () => {
   localStorage.removeItem(trackerStorageKey);
   trackerReferenceInput.value = "";
   latestReferenceEl.textContent = "Not generated yet";
-  latestReferenceBox.style.display = "none";
+  latestReferenceBox.classList.add("hidden");
   renderTrackerRecord(null, "All local draft/tracker data cleared on this device.");
   setDraftStatus("No saved draft yet. Only loan preferences are stored when you save draft.");
 });
@@ -573,7 +599,7 @@ applicationForm.addEventListener("submit", (event) => {
   });
 
   latestReferenceEl.textContent = trackerRecord.referenceId;
-  latestReferenceBox.style.display = "block";
+  latestReferenceBox.classList.remove("hidden");
   trackerReferenceInput.value = trackerRecord.referenceId;
   renderTrackerRecord(trackerRecord, `Reference ${trackerRecord.referenceId} generated successfully.`);
 
@@ -589,8 +615,12 @@ applicationForm.addEventListener("submit", (event) => {
 
 document.getElementById("year").textContent = new Date().getFullYear();
 renderPayoffResult();
-if (localStorage.getItem(applicationDraftKey)) {
+
+const initialStoredDraft = getStoredValidDraft();
+if (initialStoredDraft.draft) {
   setDraftStatus("A saved draft is available. Click “Resume Draft” to load it.", true);
+} else if (initialStoredDraft.reason === "expired") {
+  setDraftStatus(`Saved draft expired after ${draftTtlDays} days and was removed.`);
 } else {
   setDraftStatus("No saved draft yet. Only loan preferences are stored when you save draft.");
 }
@@ -598,7 +628,7 @@ if (localStorage.getItem(applicationDraftKey)) {
 const initialTrackerRecords = getStoredTrackerRecords();
 if (initialTrackerRecords.length > 0) {
   latestReferenceEl.textContent = initialTrackerRecords[0].referenceId;
-  latestReferenceBox.style.display = "block";
+  latestReferenceBox.classList.remove("hidden");
   trackerReferenceInput.value = initialTrackerRecords[0].referenceId;
   renderTrackerRecord(initialTrackerRecords[0], "Latest saved application has been loaded into tracker.");
 } else {
