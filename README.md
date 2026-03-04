@@ -156,6 +156,10 @@ Option 2 (recommended for cleaner testing):
 4. Branch: `master`, folder: `/ (root)`
 5. Save and wait for deployment
 
+## Security
+
+Please review the security policy in [SECURITY.md](SECURITY.md) for supported versions and vulnerability reporting guidance.
+
 ## Current Notes
 
 - This version is frontend-only (no backend API/database)
