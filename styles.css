@@ -489,6 +489,16 @@ input[type="range"] {
   margin: 0.25rem 0;
 }
 
+.demo-notice {
+  margin: 0.35rem 0 0.15rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #e4d5ab;
+  border-radius: 8px;
+  background: #fff9ea;
+  color: #5f4a1f;
+  font-size: 0.88rem;
+}
+
 .draft-status {
   margin-top: 0.75rem;
   padding: 0.6rem 0.75rem;
