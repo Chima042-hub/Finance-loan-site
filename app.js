@@ -215,7 +215,12 @@ eligibilityForm.addEventListener("submit", (event) => {
     coachTips.push("Excellent affordability profile. Maintain stable income and current repayment behavior.");
   }
 
-  eligibilityCoachEl.innerHTML = coachTips.map((tip) => `<li>${tip}</li>`).join("");
+  eligibilityCoachEl.textContent = "";
+  coachTips.forEach((tip) => {
+    const tipItem = document.createElement("li");
+    tipItem.textContent = tip;
+    eligibilityCoachEl.appendChild(tipItem);
+  });
   eligibleAmount.textContent = formatRand(maxLoan);
 });
 
@@ -224,6 +229,7 @@ const successBox = document.getElementById("application-success");
 const phoneInput = document.getElementById("phone");
 const saveDraftBtn = document.getElementById("save-draft-btn");
 const resumeDraftBtn = document.getElementById("resume-draft-btn");
+const clearAllDataBtn = document.getElementById("clear-all-data-btn");
 const draftStatusEl = document.getElementById("draft-status");
 const latestReferenceBox = document.getElementById("latest-reference-box");
 const latestReferenceEl = document.getElementById("latest-reference");
@@ -238,7 +244,7 @@ const trackerStepEls = Array.from(document.querySelectorAll("#tracker-steps .tra
 const saPhonePattern = /^0\d{2} \d{3} \d{4}$/;
 const applicationDraftKey = "chima-loan-service-application-draft-v1";
 const trackerStorageKey = "chima-loan-service-tracker-v1";
-const applicationFieldIds = ["full-name", "email", "phone", "loan-type", "amount", "tenure", "message", "consent"];
+const applicationFieldIds = ["loan-type", "amount", "tenure", "consent"];
 
 function setDraftStatus(message, isReady = false) {
   draftStatusEl.textContent = message;
@@ -323,7 +329,18 @@ function resumeApplicationDraft(showMessage = true) {
 
 function clearApplicationDraft() {
   localStorage.removeItem(applicationDraftKey);
-  setDraftStatus("No saved draft yet. Use “Save Draft” to store your application on this device.");
+  setDraftStatus("No saved draft yet. Only loan preferences are stored when you save draft.");
+}
+
+function maskPhoneForTracker(value) {
+  const digits = value.replace(/\D/g, "");
+  const lastFour = digits.slice(-4);
+
+  if (!lastFour) {
+    return "";
+  }
+
+  return `***${lastFour}`;
 }
 
 function getStoredTrackerRecords() {
@@ -401,12 +418,14 @@ function renderTrackerRecord(record, feedbackMessage = "") {
   trackerCurrentStageEl.textContent = stageNames[stage];
   trackerLastUpdatedEl.textContent = new Date(record.createdAt).toLocaleString();
 
+  const applicantLabel = record.maskedPhone ? `Applicant (${record.maskedPhone})` : "Applicant";
+
   if (stage === 0) {
-    trackerSummaryEl.textContent = `${record.fullName || "Applicant"}: your ${loanTypeLabels[record.loanType] || "loan"} request is submitted and queued.`;
+    trackerSummaryEl.textContent = `${applicantLabel}: your ${loanTypeLabels[record.loanType] || "loan"} request is submitted and queued.`;
   } else if (stage === 1) {
-    trackerSummaryEl.textContent = `${record.fullName || "Applicant"}: verification is in progress for ${formatRand(record.amount || 0)} requested.`;
+    trackerSummaryEl.textContent = `${applicantLabel}: verification is in progress for ${formatRand(record.amount || 0)} requested.`;
   } else {
-    trackerSummaryEl.textContent = `${record.fullName || "Applicant"}: your request is approved and ready for offer confirmation.`;
+    trackerSummaryEl.textContent = `${applicantLabel}: your request is approved and ready for offer confirmation.`;
   }
 
   trackerStepEls.forEach((stepEl, index) => {
@@ -523,8 +542,14 @@ clearTrackerBtn.addEventListener("click", () => {
   renderTrackerRecord(null, "Tracker data cleared on this device.");
 });
 
-applicationForm.addEventListener("input", () => {
-  saveApplicationDraft(false);
+clearAllDataBtn.addEventListener("click", () => {
+  localStorage.removeItem(applicationDraftKey);
+  localStorage.removeItem(trackerStorageKey);
+  trackerReferenceInput.value = "";
+  latestReferenceEl.textContent = "Not generated yet";
+  latestReferenceBox.style.display = "none";
+  renderTrackerRecord(null, "All local draft/tracker data cleared on this device.");
+  setDraftStatus("No saved draft yet. Only loan preferences are stored when you save draft.");
 });
 
 applicationForm.addEventListener("submit", (event) => {
@@ -542,7 +567,7 @@ applicationForm.addEventListener("submit", (event) => {
   const trackerRecord = addTrackerRecord({
     referenceId: generateReferenceId(),
     createdAt: new Date().toISOString(),
-    fullName: document.getElementById("full-name").value.trim(),
+    maskedPhone: maskPhoneForTracker(phoneInput.value),
     loanType: document.getElementById("loan-type").value,
     amount: Number(document.getElementById("amount").value) || 0
   });
@@ -566,6 +591,8 @@ document.getElementById("year").textContent = new Date().getFullYear();
 renderPayoffResult();
 if (localStorage.getItem(applicationDraftKey)) {
   setDraftStatus("A saved draft is available. Click “Resume Draft” to load it.", true);
+} else {
+  setDraftStatus("No saved draft yet. Only loan preferences are stored when you save draft.");
 }
 
 const initialTrackerRecords = getStoredTrackerRecords();
