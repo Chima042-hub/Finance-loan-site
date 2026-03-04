@@ -613,6 +613,20 @@ footer {
   color: #9dadc8;
 }
 
+.footer-links {
+  margin-top: 0.9rem;
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  color: #c6d3ea;
+  font-size: 0.88rem;
+}
+
+.footer-links a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .hidden {
   display: none;
 }
